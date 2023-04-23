@@ -1,0 +1,120 @@
+#   elementi di base = arrays: liste con proprietà particolari
+#   arrays sono liste con elementi dello stesso tipo -> più veloci
+#   si può usare pycharm e colab
+
+import numpy as np
+a = np.array([1, 2, 3])
+a_tipospecificato = np.array([1, 2, 3], dtype='int8')
+b = np.array([[1, 2, 3],
+              [4, 5, 6]])   #array bidimensionale = matrice: sono specificate le righe
+c = np.array([[[1, 2, 2], [1, 1, 1]],[[0 ,0, 1], [1, 0, 0]]]) #tensore
+
+v1 = np.array([3,6,9])
+A = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]])  
+
+a.ndim
+b.size
+c.shape
+a.dtype
+
+np.zeros((10,), dtype='int64')
+np.ones((10,10), dtype='int64')
+matriciona = np.full((10,10), 43, dtype='int64')
+np.diag(A,0) #elementi della diagonale; sostituendo 0 con 1,2 ecc ottengo la sovradiagonale, la sovrasovradiagonale ecc
+np.random.rand(3, 3) #matrice 3x3 di numeri casuali tra 0 e 1
+np.random.randint(1, 10, size=(10,)) #10 numeri casuali tra 1 e 9 compresi
+np.identity(3)
+arr = np.array([[1, 2, 3]])
+np.repeat(arr, 3, axis=0) #axis=0 ripeto le righe, axis=1 ripeto le colonne -> formo matrici da array 1dim
+
+X = np.array([1, 2, 3])
+Y = X
+Z = np.copy(X)
+Z[0]=100
+Y[1]=1000
+X
+Y
+Z
+
+matrix = np.array([[1,2,3,4,5]
+                  [6,7,8,9,10]
+                  [11,12,13,14,15]])
+matrix[0][0]
+matrix[1,:]
+matrix[1, 1:4:2]
+matrix[:,1]=np.array([10,100,1000])
+matrix
+amatrice = np.array([[1,2,3,4],[5,6,7,8]])
+amatrice.reshape((1,8))
+
+np.sqrt(amatrice)
+np.exp(1)
+np.log10(1000)
+np.log(np.exp(3))
+np.log2(128)
+np.cos(np.pi)
+np.arctan(1) == np.pi/4
+np.arctan2(1, -1) #prima la y poi la x (funzione arctan che da info sul quadrante)
+np.degrees(np.arctan2(1, -1))
+np.arctan(np.array([1,2,3,4,5,6]))
+np.emath.log(1+1j)  #emath è sottomodulo anche per i numeri complessi
+
+#numpy.linalg
+A = np.array([[1,2,3,4,5]
+                [6,7,8,9,10]
+                [11,12,13,14,15]])
+B = np.copy(A)
+
+
+np.matmul(A,B)  #moltiplicazione matriciale
+np.linalg.det(A)
+np.linalg.eig(A) #ha come output un vettore di avl e una matrice con colonne gli avl normalizzati
+eig,eigv = np.linalg.eig(A)
+eig
+eigv
+#   .T = trasposta
+np.matmul(A, eigv[:, 0].T) == eig[0]*eigv[:, 0].T
+np.linalg.solve(A,v1) #sistema lineare
+np.linalg.inv(A)    # inverte matrice
+caso = np.arange(0, 1.1, 0.1)   #elementi equispaziati di 0.1 da 0 incluso a 1.1 escluso
+np.savetxt("caso.txt", caso)
+
+sin_caso = np.array([caso, np.sin(caso)])
+np.savetxt("sin_caso.txt", sin_caso, delimiter=';', newline=' , ', header='TITOLO')
+np.genfromtxt("caso.txt")
+np.genfromtxt("sin_caso.txt", delimiter=';')
+
+import matplotlib.pyplot as plt
+
+np.min(arr)
+np.max(arr)
+np.min(arr, axis=1) #minimo di ogni colonna
+np.median(arr)
+np.mean(arr)
+np.std(arr) == np.sqrt(np.var(arr))
+np.var(arr, ddof=1) #varianza specificando i vincoli
+
+
+VOTI = np.array([27, 24, 30])
+CREDITI = np.array([8, 12, 6])
+np.average(VOTI, weights=CREDITI)
+
+d = 3.33e-6
+x = np.array([1, 2, 3])
+y = np.array([3, 6, 9])
+erry = np.array([0.1, 0.2, 0.03])
+
+# numpy.polyfit
+
+plt.plot(x, y, '.')
+plt.show()
+fit,cov = np.polyfit(x, y, 1, w=1/erry, cov='unscaled') #Con cov=True la funzione usa chiquadro=gdl per calcolare la matrice di covarianza
+fit #nel risultato i parametri sono in ordine decrescente di grado
+np.sqrt(cov[0,0]) #errore del parametro di grado 1
+np.corrcoef(x,y) #coeff pearson sta sull'antidiagonale
+#per correlazioni tra più set di dati diamo in input a corrcoef un array di arry con in colonna i dataset da confrontare
+plt.errorbar(x, y, yerr=erry, fmt='.')
+#plt.plot(x_th, fit[0])
+
