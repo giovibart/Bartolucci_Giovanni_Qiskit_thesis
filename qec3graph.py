@@ -69,8 +69,8 @@ for p_bitflip in p_bf:
 
     #if an error is detected in one of the qubits we apply a classically controlled not gate to correct it
     qc.x(data[1]).c_if(sbit, 1)        #ATTENTION: '1' = '01' == 'sbit[1],sbit[0]'           
-    qc.x(data[2]).c_if(sbit, 10)       #ATTENTION: '10' == 'sbit[1],sbit[0]'        
-    qc.x(data[0]).c_if(sbit, 11)       #ATTENTION: '11' == 'sbit[1],sbit[0]'
+    qc.x(data[2]).c_if(sbit, 2)       #ATTENTION: '10' == 'sbit[1],sbit[0]'        
+    qc.x(data[0]).c_if(sbit, 3)       #ATTENTION: '11' == 'sbit[1],sbit[0]'
 
 
     qc.measure_all()    # measure the qubits
