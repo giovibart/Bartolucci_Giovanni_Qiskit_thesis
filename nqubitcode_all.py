@@ -31,13 +31,16 @@ def ptheo(n, pbf):
         val += math.comb(n,i)*math.pow(pbf,i)*math.pow(1-pbf,n-i)
     return val
 
+print("(CYCLIC) n QUBIT REPETITION CODE QEC SIMULATION\n\nProbability(bitflip) inserts an ideal noise model only on idle gate,\nsimulating a faulty quantum memory\n")
+print("\nP(Depolarizing_gate_error) inserts a more realistic noise model\napplied on all 1 and 2 qubits quantum gates\n")
+
 check = 1
 while (check==1):
-    n = input("n qubit repetition code\nInsert n = number of data qubits encoding the logical qubit:\n")
-    if (float(n).is_integer() and float(n)>=3 and float(n)<=15 and float(n)%2!=0):
+    n = input("\nInsert n = number of data qubits encoding the logical qubit:\n")
+    if (float(n).is_integer() and float(n)>=3 and float(n)<=30 and float(n)%2!=0):
         check=2
     else:
-        print("\nNon valid input: insert a odd integer number between 3 and 15\n")
+        print("\nNon valid input: insert a odd integer number between 3 and 30 included\n")
         check=1
 n = int(n)
 
@@ -69,9 +72,9 @@ for i in range (n):
                 tempstr = tempstr + '1'
         table[i][j] = int(tempstr, base=2)
 
-p_bf = input("NOISE MODEL\nInsert value for P(bitflip_error):\n")
+p_bf = input("NOISE MODEL\nInsert value for P(bitflip_error) = probability of flipping the qubit (X error) after the identity gate: \n")
 p_bitflip = float(p_bf)
-p_g = input("\nInsert value for P(depolarizing_gate_error):\n")
+p_g = input("\nInsert value for P(depolarizing_gate_error) = probability of random Pauli error after every gate: \n")
 p_gate = float(p_g)
 rounds = input("\nCYCLIC QEC\nInsert number of qec rounds:\n")
 rs = int(rounds)

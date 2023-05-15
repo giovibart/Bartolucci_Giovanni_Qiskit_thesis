@@ -31,12 +31,12 @@ def ptheo(n, pbf):
         val += math.comb(n,i)*math.pow(pbf,i)*math.pow(1-pbf,n-i)
     return val
 
-print("(cyclic) 3 qubit code simulation\nP_bitflip inserts an ideal noise model only on idle gate simulating a faulty quantum memory")
-print("depolarizing_gate_error inserts a more realistic noise model an all 1 and 2 qubits quantum gates")
-p_bf = input("NOISE MODEL\nInsert value for P(bitflip_error):\n")
-p_bitflip = float(p_bf)
-p_g = input("\nInsert value for P(depolarizing_gate_error):\n")
-p_gate = float(p_g)
+print("(CYCLIC) 3 QUBIT REPETITION CODE QEC SIMULATION\n\nProbability(bitflip) inserts an ideal noise model only on idle gate,\nsimulating a faulty quantum memory\n")
+print("\nP(Depolarizing_gate_error) inserts a more realistic noise model\napplied on all 1 and 2 qubits quantum gates\n")
+p_bf = input("NOISE MODEL\nInsert value for P(bitflip_error) = probability of flipping the qubit (X error) after the identity gate: \n")
+p_bitflip = float(p_bf)     
+p_g = input("\nInsert value for P(depolarizing_gate_error) = probability of random Pauli error after every gate: \n")
+p_gate = float(p_g)        
 rounds = input("\nCYCLIC QEC\nInsert number of qec rounds:\n")
 rs = int(rounds)
 deltat = input("\nInsert wait time units between rounds:\n")

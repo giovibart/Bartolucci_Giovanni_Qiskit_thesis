@@ -1,3 +1,10 @@
+#Graph producing program for [5,1,3] Steane QEC code with bitflip noise only on idetity gates
+#Probability of bitflip is sweeped between 10^(-4) and 0.32 in logscale and resulting P_success of the code is plotted
+#Different lines are for different values of wait time between each rounds of error correction and number of total rounds.
+#Total wait time is always 32units but each line represents a different way to dissect the correction in rounds
+#A zoom of the graph is also produced to better show the behaviour of the code for low values of p_bitflip, where the code is more effective, 
+#Here P_failure is plotted in logscale (instead of P_success) to highlight the differences between each way of dissecting the correction in rounds
+
 #import qiskit
 import matplotlib.pyplot as plt
 import numpy as np
