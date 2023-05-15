@@ -18,18 +18,33 @@ def get_noise(p_meas,p_gate):
 
     noise_model = NoiseModel()
     noise_model.add_all_qubit_quantum_error(error_meas, "measure") # measurement error is applied to measurements
-    noise_model.add_all_qubit_quantum_error(error_gate1, ["x"]) # single qubit gate error is applied to x gates
+    noise_model.add_all_qubit_quantum_error(error_gate1, ['u1', 'u2', 'u3']) # single qubit gate error is applied to all gates
+    noise_model.add_all_qubit_quantum_error(error_gate1, ["id"]) # single qubit gate error is applied to identity gate = q-memory simulator
     noise_model.add_all_qubit_quantum_error(error_gate2, ["cx"]) # two qubit gate error is applied to cx gates
-        
+    noise_model.add_all_qubit_quantum_error(error_gate2, ["cz"]) # two qubit gate error is applied to cz gates    
     return noise_model
 
-noise_model = get_noise(0.01,0.01)
-aer_sim = AerSimulator(noise_model = get_noise(0.01,0.01))  #initializes noise model with p_gate = p_meas = 1%
+noise_model = get_noise(0.0, 0.01)
+aer_sim = AerSimulator(noise_model = get_noise(0.0, 0.01))  #initializes noise model with p_gate = p_meas = 1%
 
 # initialization of a Quantum Circuit with three qubits in the 0 state (|000>)
 
-qc0 = QuantumCircuit(3) 
-qc0.measure_all() # measure the qubits
+data = QuantumRegister(3, 'code_qubit')
+cbit = ClassicalRegister(1, 'simulator_bypass_bit')
+qc0 = QuantumCircuit(data, cbit)
+
+#qc0.id(data).c_if(cbit, 0)
+# qc0.cz(data[0], data[1])
+# qc0.cz(data[0], data[1]).c_if(cbit, 0)
+#qc0.x(data)
+#qc0.x(data).c_if(cbit, 0)
+#qc0.p(np.pi, data)
+#qc0.p(np.pi, data).c_if(cbit, 0)
+# qc0.z(data[0])
+# qc0.z(data[0]).c_if(cbit, 0)
+qc0.h(data[0])
+qc0.h(data[0]).c_if(cbit, 0)        
+qc0.measure_all()
 
 # run the circuit with the noise model and extract the counts
 circ_n = transpile(qc0, aer_sim)
