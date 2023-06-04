@@ -47,31 +47,58 @@ n = int(n)
 
 #LOOKUPTABLE DEFINITION
 nerr = int((n-1)/2)     #maximum number of errors that can be corrected
-err = [[0] * n for i in range(nerr)]    #err[0:nerr][0:nqubit]
-
+nsyn = 0
 for i in range (nerr):
-    err[i][0:(i+1)]=[1]*(i+1)   #err[i] = sequence of nerr 1s and (n-nerr) 0s
+    nsyn = nsyn + math.comb(n,i+1)
 
-syndrome = []
+def gen(n):
+    if n == 1:
+        yield from [[0], [1]]
+    else:
+        for a in gen(n-1):
+            yield [0] + a
+        
+        for a in gen(n-1):
+            yield [1] + a
+            
+cs = sorted([
+    c
+    for c in gen(n)
+    if sum(c) <= nerr
+], key=lambda x : sum(x))
+
+cs.pop(0)
+
+ancmeas = np.zeros((n-1), dtype=int)
+syndrome = np.zeros((nsyn), dtype=int)
+positions2 = [np.zeros((math.comb(n,x+1),x+1), dtype=int) for x in range(nerr)]
+
+ind=0
+isub = 0
+ierr = 0
+for x in cs:
+
+    indpos = 0
+    if (ierr!=sum(x)-1):
+        isub = isub + math.comb(n,ierr+1)
+        ierr = sum(x)-1
+
+    ancmeas.fill(0) 
+    for j in range (n-1,0,-1):
+        if(x[j]!=x[j-1]):   #if two consecutive qubits are different, the ancilla measurement is 1 (qiskit reads measurements in reverse order)
+            ancmeas[n-1-j] = 1
+        if(x[j]==1):
+            positions2[ierr][ind-isub][indpos]=j  #saves the positions of the errors
+            indpos=indpos+1
+    if(x[0]==1):
+        positions2[ierr][ind-isub][indpos]=0    
+    syndrome[ind] = int(''.join(map(str, ancmeas)), 2)  #salva la sindrome in decimale
+    ind=ind+1
+
 positions = []
-
-for i in range(nerr):
-    for x in set(permutations(err[i])):     #evaluates all possible permutations of err[i] = all possible configurations of a n qubit string with (i+1) errors
-        tempstr = ""
-        templst = []
-        for j in range (n-1,0,-1):
-            if(list(x)[j]==list(x)[j-1]):
-                tempstr = tempstr + '0'
-            else:
-                tempstr = tempstr + '1'
-            if(list(x)[j]==1):
-                templst.append(j)
-        if(list(x)[0]==1):
-            templst.append(0)
-        positions.append(templst)
-        syndrome.append(int(tempstr, base=2))
-#syndrome is a list of all possible syndrome measurements (in decimal and reversed because qiskit measures in reverse order)    syndrome[0:n_syndromes]
-#positions is a list of all the corresponding positions of errors for each possible syndrome     positions[0:n_syndromes][0:n_faulty_qubits]
+[positions.extend(list(l)) for l in positions2]
+#syndrome is a list of all possible syndrome measurements (in decimal and reversed because qiskit measures in reverse order)    syndrome[0:n_syndromes-1]
+#positions is a list of all the corresponding positions of errors for each possible syndrome     positions[0:n_syndromes][0:n_faulty_qubits-1]
 
 p_bf = input("NOISE MODEL\nInsert value for P(bitflip_error) = probability of flipping the qubit (X error) after the identity gate: \n")
 p_bitflip = float(p_bf)
@@ -127,10 +154,10 @@ for i in range (rs):
         qc.measure(anc[j], sbit[j])  #ancilla is measured and the result stored in a classical bit
 
     #if an error is detected in one of the qubits we apply a classically controlled not gate to correct it
-    for nsyn in range (len(syndrome)):
-        with qc.if_test((sbit, syndrome[nsyn])):
-            for j in range (len(positions[nsyn])):
-                qc.x(data[positions[nsyn][j]])
+    for i_syn in range (len(syndrome)):
+        with qc.if_test((sbit, int(syndrome[i_syn]))):
+            for j in range (len(positions[i_syn])):
+                qc.x(data[positions[i_syn][j]])
 
 print(qc)
 qc.measure_all()    # measure the qubits

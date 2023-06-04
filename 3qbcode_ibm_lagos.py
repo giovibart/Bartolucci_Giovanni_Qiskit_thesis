@@ -34,13 +34,13 @@ chain = [2, 1, 3, 5, 6]
 
 qc = QuantumCircuit(qr, tbit, sbit, mbit)
 
-qc.h(qr[test[0]])   #example: I want to store the information of a |+> state in a single qubit
-qc.h(qr[test[1]])   #statistics with n=2 :/
+# qc.h(qr[test[0]])   #example: I want to store the information of a |+> state in a single qubit
+# qc.h(qr[test[1]])   #statistics with n=2 :/
 
-qc.h(qr[data[0]])   #example: I want to store the information of a |+> state in the data qubits
+# qc.h(qr[data[0]])   #example: I want to store the information of a |+> state in the logical qubit
 
-#this circuit encodes the information of the first data qubit's state in all the data qubits and then measures their XX-stabilizers
-#the circuit has minimun possible depth in chain-disposed qubits 
+# The following circuit encodes the first data qubit's state in all the data qubits and then measures their XX-stabilizers
+# the circuit has minimum possible depth in chain-disposed qubits 
 for i in range (len(chain)-1):
     qc.cx(qr[chain[i]], qr[chain[i+1]])
 
@@ -99,6 +99,6 @@ backend = provider.get_backend("ibm_lagos")     #Between "" is the name of the c
 transpiled = transpile(qc, backend=backend, initial_layout=initial_layout)  #initial_layout contains all the on-circuit optimization information
 
 # Submit a job
-job = backend.run(transpiled, shots=4096, dynamic=True)
+job = backend.run(transpiled, shots=7*1024, dynamic=True)
 
 print(job.status())  #Hopefully Queued
