@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/617128857.svg)](https://zenodo.org/badge/latestdoi/617128857)
 # qiskit_thesis
 Python codes to perform Quantum Error Correction on real hardware and Aer simulator using Qiskit.
 '_graph' files produce the plots of each algorithm's simulated success probabilities as a function of the noise model's parameter (error probability), swiped in logscale.
