@@ -27,7 +27,7 @@ def get_noise(p_gate):
     noise_model.add_all_qubit_quantum_error(error_gate1, ['u1', 'u2', 'u3']) # single qubit gate error is applied to all gates
     noise_model.add_all_qubit_quantum_error(error_gate1, ["id"]) # single qubit gate error is applied to identity gate = q-memory simulator
     noise_model.add_all_qubit_quantum_error(error_gate2, ["cx"]) # two qubit gate error is applied to cx gates
-    noise_model.add_all_qubit_quantum_error(error_gate2, ["cz"]) # two qubit gate error is applied to cx gates
+    noise_model.add_all_qubit_quantum_error(error_gate2, ["cz"]) # two qubit gate error is applied to cz gates
         
     return noise_model
 
@@ -170,25 +170,25 @@ plt.xlim([1e-04, 0.11])
 plt.savefig("cyc3_Psucc_vs_Pbf.png", dpi=1000)
 plt.show()
 
-plt.plot(p_g_fail, Pfail_u, marker='.', color='black')
-plt.plot(p_g_fail, Pfail_2u, marker='.', color='red')
-plt.plot(p_g_fail, Pfail_4u, marker='.', color='blue')
-plt.plot(p_g_fail, Pfail_8u, marker='.', color='green')
-plt.plot(p_g_fail, Pfail_16u, marker='.', color='pink')
-plt.plot(p_g_fail, Pfail_32u, marker='.', color='brown')
-plt.plot(p_g_fail, Pfail_teo, marker='+', color='purple')
+# plt.plot(p_g_fail, Pfail_u, marker='.', color='black')
+# plt.plot(p_g_fail, Pfail_2u, marker='.', color='red')
+# plt.plot(p_g_fail, Pfail_4u, marker='.', color='blue')
+# plt.plot(p_g_fail, Pfail_8u, marker='.', color='green')
+# plt.plot(p_g_fail, Pfail_16u, marker='.', color='pink')
+# plt.plot(p_g_fail, Pfail_32u, marker='.', color='brown')
+# plt.plot(p_g_fail, Pfail_teo, marker='+', color='purple')
 
-plt.grid()
-plt.xlabel("P(gate_depolarizing_error) [logscale]", fontsize=15, fontname='Sans')
-plt.ylabel("P(failure) = 1 - P(success) [logscale]", fontsize=15, fontname='Sans')
-plt.title("Probability of getting wrong state after QEC as a function of gate depolarizing error probability", fontsize=20, fontname='Sans', fontweight='bold')
-plt.suptitle("QEC: cyclic 3-qubit code [3,1]", fontsize=20, fontname='Sans', fontweight='bold')
-plt.xscale('log')
-plt.yscale('log')
-plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
-                "with QEC r=16 dt=2u","with QEC r=32 dt=1u", "1 qubit, no correction for dt=32u"], fontsize=14, loc='upper left')
+# plt.grid()
+# plt.xlabel("P(gate_depolarizing_error) [logscale]", fontsize=15, fontname='Sans')
+# plt.ylabel("P(failure) = 1 - P(success) [logscale]", fontsize=15, fontname='Sans')
+# plt.title("Probability of getting wrong state after QEC as a function of gate depolarizing error probability", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.suptitle("QEC: cyclic 3-qubit code [3,1]", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.xscale('log')
+# plt.yscale('log')
+# plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
+#                 "with QEC r=16 dt=2u","with QEC r=32 dt=1u", "1 qubit, no correction for dt=32u"], fontsize=14, loc='upper left')
 
-plt.xticks([10**(-4), 10**(-3), zoomb])
-plt.xlim([1e-04, zoomb])
-plt.savefig("cyc3_Pfail_vs_Pbf.png", dpi=1000)
-plt.show()
+# plt.xticks([10**(-4), 10**(-3), zoomb])
+# plt.xlim([1e-04, zoomb])
+# plt.savefig("cyc3_Pfail_vs_Pbf.png", dpi=1000)
+# plt.show()

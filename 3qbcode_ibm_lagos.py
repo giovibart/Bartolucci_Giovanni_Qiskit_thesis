@@ -1,4 +1,8 @@
-# This code runs dynamical cyclic 3-qubit code bitflip error correction on IBM Quantum systems with 7 qubits; for example IBM_LAGOS
+# Job launching program for cyclic 3-Qubit code on IBM Quantum systems with 7 qubits, for example IBM_LAGOS
+# You can input the state you want to encode. 2 test qubit will be initialized in the same state and left idling during the code.
+#You can also select the number of rounds of error correction you want to perform.
+# The program automatically selects the best initial layout for the code constructing a continuous chain that avoids the most noisy qubits.
+
 #Useful libraries:
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile, Aer
 from qiskit.tools.monitor import job_monitor
@@ -18,6 +22,9 @@ rs = 2   #number of qec rounds
 
 rs = rs-1   #effective rounds are rs+1, this are just the rounds inside the 'for' loop
 
+bs = input("Insert the number corresponding to the state you want to encode: '0'<->|0>, '1'<->|1>, '2'<->|+>\n")
+bs = int(bs)
+
 #Initialization of the quantum registers: 3 data qubits, 2 ancillas, 2 classical bits
 qr = QuantumRegister(7)
 sbit = ClassicalRegister(2)     #syndrome bits
@@ -34,10 +41,15 @@ chain = [2, 1, 3, 5, 6]
 
 qc = QuantumCircuit(qr, tbit, sbit, mbit)
 
-# qc.h(qr[test[0]])   #example: I want to store the information of a |+> state in a single qubit
-# qc.h(qr[test[1]])   #statistics with n=2 :/
+if (bs==1):
+    qc.x(qr[data[0]])   #example: I want to store the information of a |1> state in a single qubit
+    qc.x(qr[test[0]])  
+    qc.x(qr[test[1]])
 
-# qc.h(qr[data[0]])   #example: I want to store the information of a |+> state in the logical qubit
+if (bs==2):
+    qc.h(qr[test[0]])  
+    qc.h(qr[test[1]])  
+    qc.h(qr[data[0]])   #example: I want to store the information of a |+> state in the logical qubit
 
 # The following circuit encodes the first data qubit's state in all the data qubits and then measures their XX-stabilizers
 # the circuit has minimum possible depth in chain-disposed qubits 

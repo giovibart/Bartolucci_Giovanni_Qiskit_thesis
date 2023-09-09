@@ -42,6 +42,7 @@ p_gate = 0.0
 
 p_g = np.logspace(-4,-1,100)
 pteo_32u = []
+pt_32u_g = []
 pfail_teo = []
 
 zoomb = 10**(-2.5) #zoom boundary
@@ -151,7 +152,7 @@ for riga in range(6):
 
         # run the circuit with the noise model and extract the counts
         circ_n = transpile(qc, aer_sim)
-        result = aer_sim.run(circ_n).result()
+        result = aer_sim.run(circ_n, shots=4096).result()
         counts = result.get_counts()
 
         x = counts.keys()
@@ -160,16 +161,18 @@ for riga in range(6):
             if "00000 0 " in i:
                 okcounts += counts[i]
 
-        psucc[riga][col] = float(okcounts/1024)
+        psucc[riga][col] = float(okcounts/4096)
         if (riga==0):
             pteo_32u.append(ptheo(32, p_gate))
+            pt_32u_g.append(pow(1-p_gate,32))
             if (p_gate <= zoomb):
                 pfail_teo.append(float(1-ptheo(32, p_gate)))
 
         if (p_gate <= zoomb):
-            pfail[riga][col] = float(1-okcounts/1024)
+            pfail[riga][col] = float(1-okcounts/4096)
 
 Pteo_32u = np.array(pteo_32u)
+Pt_32u_g = np.array(pt_32u_g)
 Pfail_teo = np.array(pfail_teo)
 
 P_cu = psucc[0]
@@ -179,56 +182,68 @@ P_c8u = psucc[3]
 P_c16u = psucc[4]
 P_c32u = psucc[5]
 
-Pfail_u = pfail[0]
-Pfail_2u = pfail[1]
-Pfail_4u = pfail[2]
-Pfail_8u = pfail[3]
-Pfail_16u = pfail[4]
-Pfail_32u = pfail[5]
+np.savetxt('5qb_dg_pg.txt', p_g)
+np.savetxt('5qb_dg_Pcu.txt', P_cu)
+np.savetxt('5qb_dg_Pc2u.txt', P_c2u)
+np.savetxt('5qb_dg_Pc4u.txt', P_c4u)
+np.savetxt('5qb_dg_Pc8u.txt', P_c8u)
+np.savetxt('5qb_dg_Pc16u.txt', P_c16u)
+np.savetxt('5qb_dg_Pc32u.txt', P_c32u)
+np.savetxt('5qb_dg_Pteo_32u.txt', Pteo_32u)
+np.savetxt('5qb_dg_Pt_32u_g.txt', Pt_32u_g)
+
+print("\nAll done!")
+
+# Pfail_u = pfail[0]
+# Pfail_2u = pfail[1]
+# Pfail_4u = pfail[2]
+# Pfail_8u = pfail[3]
+# Pfail_16u = pfail[4]
+# Pfail_32u = pfail[5]
 
 
-plt.plot(p_g, P_cu, marker='.', color='black')
-plt.plot(p_g, P_c2u, marker='.', color='red')
-plt.plot(p_g, P_c4u, marker='.', color='blue')
-plt.plot(p_g, P_c8u, marker='.', color='green')
-plt.plot(p_g, P_c16u, marker='.', color='pink')
-plt.plot(p_g, P_c32u, marker='.', color='brown')
-plt.plot(p_g, Pteo_32u, marker='+', color='purple')
+# plt.plot(p_g, P_cu, marker='.', color='black')
+# plt.plot(p_g, P_c2u, marker='.', color='red')
+# plt.plot(p_g, P_c4u, marker='.', color='blue')
+# plt.plot(p_g, P_c8u, marker='.', color='green')
+# plt.plot(p_g, P_c16u, marker='.', color='pink')
+# plt.plot(p_g, P_c32u, marker='.', color='brown')
+# plt.plot(p_g, Pteo_32u, marker='+', color='purple')
 
-plt.grid()
-plt.xlabel("P(depolarizing gate error) [logscale]", fontsize=15, fontname='Sans')
-plt.ylabel("P(success) = (correct final state counts)/(total counts)", fontsize=15, fontname='Sans')
-plt.title("Probability of getting target-state after QEC as a function of depolarizing gate error probability", fontsize=20, fontname='Sans', fontweight='bold')
-plt.suptitle("QEC: cyclic 5-qubit code [5,1]", fontsize=20, fontname='Sans', fontweight='bold')
-plt.xscale('log')
-plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
-                "with QEC r=16 dt=2u","with QEC r=32 dt=1u", "1 qubit, no correction for dt=32u"], fontsize=14, loc='lower left')
-#plt.yticks(np.arange(0, 1.1, 0.1))
-plt.xticks([10**(-4), 10**(-3), 10**(-2), 0.1])
-plt.xlim([1e-04, 0.1])
-#plt.ylim([0.7,1])
-plt.savefig("cyc5_Psucc_vs_Pbf.png", dpi=1000)
-plt.show()
+# plt.grid()
+# plt.xlabel("P(depolarizing gate error) [logscale]", fontsize=15, fontname='Sans')
+# plt.ylabel("P(success) = (correct final state counts)/(total counts)", fontsize=15, fontname='Sans')
+# plt.title("Probability of getting target-state after QEC as a function of depolarizing gate error probability", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.suptitle("QEC: cyclic 5-qubit code [5,1]", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.xscale('log')
+# plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
+#                 "with QEC r=16 dt=2u","with QEC r=32 dt=1u", "1 qubit, no correction for dt=32u"], fontsize=14, loc='lower left')
+# #plt.yticks(np.arange(0, 1.1, 0.1))
+# plt.xticks([10**(-4), 10**(-3), 10**(-2), 0.1])
+# plt.xlim([1e-04, 0.1])
+# #plt.ylim([0.7,1])
+# plt.savefig("cyc5_Psucc_vs_Pbf.png", dpi=1000)
+# plt.show()
 
-plt.plot(p_g_fail, Pfail_u, marker='.', color='black')
-plt.plot(p_g_fail, Pfail_2u, marker='.', color='red')
-plt.plot(p_g_fail, Pfail_4u, marker='.', color='blue')
-plt.plot(p_g_fail, Pfail_8u, marker='.', color='green')
-plt.plot(p_g_fail, Pfail_16u, marker='.', color='pink')
-plt.plot(p_g_fail, Pfail_32u, marker='.', color='brown')
-#plt.plot(p_g_fail, Pfail_teo, marker='+', color='purple')
+# plt.plot(p_g_fail, Pfail_u, marker='.', color='black')
+# plt.plot(p_g_fail, Pfail_2u, marker='.', color='red')
+# plt.plot(p_g_fail, Pfail_4u, marker='.', color='blue')
+# plt.plot(p_g_fail, Pfail_8u, marker='.', color='green')
+# plt.plot(p_g_fail, Pfail_16u, marker='.', color='pink')
+# plt.plot(p_g_fail, Pfail_32u, marker='.', color='brown')
+# #plt.plot(p_g_fail, Pfail_teo, marker='+', color='purple')
 
-plt.grid()
-plt.xlabel("P(depolarizing gate error) [logscale]", fontsize=15, fontname='Sans')
-plt.ylabel("P(failure) = 1 - P(success) [logscale]", fontsize=15, fontname='Sans')
-plt.title("Probability of getting wrong state after QEC as a function of depolarizing gate error probability", fontsize=20, fontname='Sans', fontweight='bold')
-plt.suptitle("QEC: cyclic 5-qubit code [5,1]", fontsize=20, fontname='Sans', fontweight='bold')
-plt.xscale('log')
-plt.yscale('log')
-plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
-                "with QEC r=16 dt=2u","with QEC r=32 dt=1u"], fontsize=14, loc='upper left')    #, "1 qubit, no correction for dt=32u"
+# plt.grid()
+# plt.xlabel("P(depolarizing gate error) [logscale]", fontsize=15, fontname='Sans')
+# plt.ylabel("P(failure) = 1 - P(success) [logscale]", fontsize=15, fontname='Sans')
+# plt.title("Probability of getting wrong state after QEC as a function of depolarizing gate error probability", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.suptitle("QEC: cyclic 5-qubit code [5,1]", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.xscale('log')
+# plt.yscale('log')
+# plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
+#                 "with QEC r=16 dt=2u","with QEC r=32 dt=1u"], fontsize=14, loc='upper left')    #, "1 qubit, no correction for dt=32u"
 
-plt.xticks([10**(-4), 10**(-3), zoomb])
-plt.xlim([1e-04, zoomb])
-plt.savefig("cyc5_Pfail_vs_Pbf.png", dpi=1000)
-plt.show()
+# plt.xticks([10**(-4), 10**(-3), zoomb])
+# plt.xlim([1e-04, zoomb])
+# plt.savefig("cyc5_Pfail_vs_Pbf.png", dpi=1000)
+# plt.show()

@@ -1,3 +1,8 @@
+# Cyclic n-Qubit Repetition code simulation with bitflip and/or depolarizing noise model.
+# You can input the size of the code, the number of qec rounds, the wait time between rounds and the noise model parameters (error probabilities).
+# The output of the program is the success probability of the code in those conditions. Also, it prints the theoretical probability of a single
+# qubit surviving unaltered the same total time in a bitflip or depolarizing memory with equal error rates to the noise model.
+
 #import qiskit
 import matplotlib.pyplot as plt
 import numpy as np
@@ -177,13 +182,11 @@ for i in x:
     if ('0'*n + " 0 ") in i:
         oksmart += counts[i]
 
-perr = 0
 if p_bitflip == 0:
-    perr = p_gate
+    pteo = (1-p_gate)**(rs*dt)
 else:
-    perr = p_bitflip
+    pteo = ptheo(rs*dt, p_bitflip)
 
-pteo = ptheo(rs*dt, perr)
 print('\nP_success = ', oksmart/1024)
 print('Probability of a single qubit surviving unaltered {} units of wait stage = {}'.format(rs*dt, pteo))
 

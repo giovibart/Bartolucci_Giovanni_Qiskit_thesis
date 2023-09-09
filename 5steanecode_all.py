@@ -1,3 +1,8 @@
+# Cyclic [5,1,3] Steane's code simulation with bitflip and/or depolarizing noise model.
+# You can input the size of the code, the number of qec rounds, the wait time between rounds and the noise model parameters (error probabilities).
+# The output of the program is the success probability of the code in those conditions. Also, it prints the theoretical probability of a single
+# qubit surviving unaltered the same total time in a bitflip or depolarizing memory with equal error rates to the noise model.
+
 #import qiskit
 import matplotlib.pyplot as plt
 import numpy as np
@@ -157,13 +162,10 @@ for i in x:
     if "0 0 " in i:
         oksmart += counts[i]
 
-perr = 0
 if p_bitflip == 0:
-    perr = p_gate
+    pteo = (1-p_gate)**(rs*dt)
 else:
-    perr = p_bitflip
-
-pteo = ptheo(rs*dt, perr)
+    pteo = ptheo(rs*dt, p_bitflip)
 
 #print('\nINPUT:\t|q0> = ({})|0> + ({})*exp(i*{})|1>'.format(np.cos(theta/2), np.sin(theta/2), phi))
 print('p_bitflip = {}\tp_gate = {}'.format(p_bitflip, p_gate))

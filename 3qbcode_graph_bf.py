@@ -7,7 +7,12 @@
 
 #import qiskit
 import matplotlib.pyplot as plt
+from matplotlib import rc
 import numpy as np
+import scipy
+from scipy.optimize import curve_fit
+from scipy.optimize import differential_evolution
+import warnings
 import math
 from qiskit import QuantumRegister, ClassicalRegister
 from qiskit import QuantumCircuit, transpile, assemble
@@ -101,7 +106,7 @@ for riga in range(6):
 
         # run the circuit with the noise model and extract the counts
         circ_n = transpile(qc, aer_sim)
-        result = aer_sim.run(circ_n).result()
+        result = aer_sim.run(circ_n, shots=2048).result()
         counts = result.get_counts()
 
         x = counts.keys()
@@ -116,7 +121,7 @@ for riga in range(6):
             elif it == "11000 0 11":
                 okcounts += counts[it]
 
-        psucc[riga][col] = float(okcounts/1024)
+        psucc[riga][col] = float(okcounts/2048)
         if (riga==0):
             pteo_32u.append(ptheo(32, p_bitflip))
             if (p_bitflip <= zoomb):
@@ -135,6 +140,15 @@ P_c8u = psucc[3]
 P_c16u = psucc[4]
 P_c32u = psucc[5]
 
+np.savetxt('3qb_bf_pbf.txt', p_bf)
+np.savetxt('3qb_bf_Pcu.txt', P_cu)
+np.savetxt('3qb_bf_Pc2u.txt', P_c2u)
+np.savetxt('3qb_bf_Pc4u.txt', P_c4u)
+np.savetxt('3qb_bf_Pc8u.txt', P_c8u)
+np.savetxt('3qb_bf_Pc16u.txt', P_c16u)
+np.savetxt('3qb_bf_Pc32u.txt', P_c32u)
+np.savetxt('3qb_bf_Pteo_32u.txt', Pteo_32u)
+
 Pfail_u = pfail[0]
 Pfail_2u = pfail[1]
 Pfail_4u = pfail[2]
@@ -143,48 +157,57 @@ Pfail_16u = pfail[4]
 Pfail_32u = pfail[5]
 
 
-plt.plot(p_bf, P_cu, marker='.', color='black')
-plt.plot(p_bf, P_c2u, marker='.', color='red')
-plt.plot(p_bf, P_c4u, marker='.', color='blue')
-plt.plot(p_bf, P_c8u, marker='.', color='green')
-plt.plot(p_bf, P_c16u, marker='.', color='pink')
-plt.plot(p_bf, P_c32u, marker='.', color='brown')
-plt.plot(p_bf, Pteo_32u, marker='+', color='purple')
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
+
+plt.figure(figsize=(10,10))
+
+plt.plot(p_bf, P_cu, linewidth=3, marker='.', ms=12, color='black')
+plt.plot(p_bf, P_c2u, linewidth=3, marker='.', ms=12, color='red')
+plt.plot(p_bf, P_c4u, linewidth=3, marker='.', ms=12, color='blue')
+plt.plot(p_bf, P_c8u, linewidth=3, marker='.', ms=12, color='green')
+plt.plot(p_bf, P_c16u, linewidth=3, marker='.', ms=12, color='pink')
+plt.plot(p_bf, P_c32u, linewidth=3, marker='.', ms=12, color='brown')
+plt.plot(p_bf, Pteo_32u, linewidth=3, marker='+', ms=12, color='purple')
+
 
 plt.grid()
-plt.xlabel("P(bitflip) [logscale]", fontsize=15, fontname='Sans')
-plt.ylabel("P(success) = (correct final state counts)/(total counts)", fontsize=15, fontname='Sans')
-plt.title("Probability of getting target-state after QEC as a function of bitflip probability", fontsize=20, fontname='Sans', fontweight='bold')
-plt.suptitle("QEC: cyclic 3-qubit code [3,1]", fontsize=20, fontname='Sans', fontweight='bold')
+plt.xlabel("P(bitflip) [logscale]", fontsize=35, fontname='Sans')
+plt.ylabel(r'$P(success) = \frac{correct\, final\, state\, counts}{total\, counts}$', fontsize=35)
+plt.title("as a function of bitflip probability", fontsize=35)
+#plt.suptitle(r'\textbf{QEC: cyclic 3-qubit code [3,1]}', fontsize=37, fontweight='bold')
 plt.xscale('log')
 plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
-                "with QEC r=16 dt=2u","with QEC r=32 dt=1u", "1 qubit, no correction for dt=32u"], fontsize=14, loc='lower left')
+                "with QEC r=16 dt=2u","with QEC r=32 dt=1u", "1 qubit, no correction for dt=32u"], fontsize=25, loc='lower left')
 #plt.yticks(np.arange(0, 1.1, 0.1))
+plt.rc('xtick', labelsize=32) 
+plt.rc('ytick', labelsize=32)
 plt.xticks([10**(-4), 10**(-3), 10**(-2), 0.1, 0.3])
 plt.xlim([1e-04, 0.33])
 #plt.ylim([0.7,1])
-plt.savefig("cyc3_Psucc_vs_Pbf.png", dpi=1000)
+#plt.savefig("cyc3_Psucc_vs_Pbf.png", dpi=1000)
 plt.show()
 
-plt.plot(p_bf_fail, Pfail_u, marker='.', color='black')
-plt.plot(p_bf_fail, Pfail_2u, marker='.', color='red')
-plt.plot(p_bf_fail, Pfail_4u, marker='.', color='blue')
-plt.plot(p_bf_fail, Pfail_8u, marker='.', color='green')
-plt.plot(p_bf_fail, Pfail_16u, marker='.', color='pink')
-plt.plot(p_bf_fail, Pfail_32u, marker='.', color='brown')
-#plt.plot(p_bf_fail, Pfail_teo, marker='+', color='purple')
 
-plt.grid()
-plt.xlabel("P(bitflip) [logscale]", fontsize=15, fontname='Sans')
-plt.ylabel("P(failure) = 1 - P(success) [logscale]", fontsize=15, fontname='Sans')
-plt.title("Probability of getting wrong state after QEC as a function of bitflip probability", fontsize=20, fontname='Sans', fontweight='bold')
-plt.suptitle("QEC: cyclic 3-qubit code [3,1]", fontsize=20, fontname='Sans', fontweight='bold')
-plt.xscale('log')
-plt.yscale('log')
-plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
-                "with QEC r=16 dt=2u","with QEC r=32 dt=1u"], fontsize=14, loc='upper left')    #, "1 qubit, no correction for dt=32u"
+# plt.plot(p_bf_fail, Pfail_u, marker='.', color='black')
+# plt.plot(p_bf_fail, Pfail_2u, marker='.', color='red')
+# plt.plot(p_bf_fail, Pfail_4u, marker='.', color='blue')
+# plt.plot(p_bf_fail, Pfail_8u, marker='.', color='green')
+# plt.plot(p_bf_fail, Pfail_16u, marker='.', color='pink')
+# plt.plot(p_bf_fail, Pfail_32u, marker='.', color='brown')
+# #plt.plot(p_bf_fail, Pfail_teo, marker='+', color='purple')
 
-plt.xticks([10**(-4), 10**(-3), zoomb])
-plt.xlim([1e-04, zoomb])
-plt.savefig("cyc3_Pfail_vs_Pbf.png", dpi=1000)
-plt.show()
+# plt.grid()
+# plt.xlabel("P(bitflip) [logscale]", fontsize=15, fontname='Sans')
+# plt.ylabel("P(failure) = 1 - P(success) [logscale]", fontsize=15, fontname='Sans')
+# plt.title("Probability of getting wrong state after QEC as a function of bitflip probability", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.suptitle("QEC: cyclic 3-qubit code [3,1]", fontsize=20, fontname='Sans', fontweight='bold')
+# plt.xscale('log')
+# plt.yscale('log')
+# plt.legend(["with QEC rounds=1 dt=32u", "with QEC rounds=2 dt=16u", "with QEC r=4 dt=8u", "with QEC r=8 dt=4u", 
+#                 "with QEC r=16 dt=2u","with QEC r=32 dt=1u"], fontsize=14, loc='upper left')    #, "1 qubit, no correction for dt=32u"
+
+# plt.xticks([10**(-4), 10**(-3), zoomb])
+# plt.xlim([1e-04, zoomb])
+# plt.savefig("cyc3_Pfail_vs_Pbf.png", dpi=1000)
+# plt.show()
