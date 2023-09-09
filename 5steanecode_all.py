@@ -1,5 +1,5 @@
 # Cyclic [5,1,3] Steane's code simulation with bitflip and/or depolarizing noise model.
-# You can input the size of the code, the number of qec rounds, the wait time between rounds and the noise model parameters (error probabilities).
+# You can input the number of qec rounds, the wait time between rounds and the noise model parameters (error probabilities).
 # The output of the program is the success probability of the code in those conditions. Also, it prints the theoretical probability of a single
 # qubit surviving unaltered the same total time in a bitflip or depolarizing memory with equal error rates to the noise model.
 
